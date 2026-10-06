@@ -1,0 +1,48 @@
+<!DOCTYPE component>
+<properties>
+    <attribute name="post"/>
+</properties>
+<component>
+    <if condition="{post.value !== null}">
+        <div id="btn" class="div">
+            <h4>
+                <value name="{post.value.title}" />
+            </h4>
+            <p>
+                <value name="{() => {
+                    return post.value.post.slice(0, 120);
+                }}"/>
+            </p>
+            <script>
+                document.getElementById("btn").onclick = () => {
+                    window.location.href = `post.html?id=${post.value.id}`
+                }
+            </script>
+        </div>
+    </if>
+
+    <style scoped>
+        div {
+            width: 20rem;
+            min-width: 20rem;
+            max-width: 20rem;
+            height: 10rem;
+            border: 2px solid black;
+            background-color: antiquewhite;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            overflow: hidden;
+            user-select: none;
+            transition-duration: 200ms;
+        }
+
+        div:hover {
+            cursor: pointer;
+            background-color:burlywood;
+        }
+
+        p {
+            line-height: 1.5rem;
+        }
+    </style>
+</component>

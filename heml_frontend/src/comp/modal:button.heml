@@ -1,0 +1,67 @@
+<!DOCTYPE component>
+<properties>
+    <attribute name="action" optional />
+    <attribute name="danger" optional />
+    <attribute name="confirm" optional />
+</properties>
+<component>
+    <if condition="{danger.value !== undefined}">
+        <button class="danger" id="btn">
+            <children />
+        </button>
+    </if>
+    <elseif condition="{confirm.value !== undefined}">
+        <button class="confirm" id="btn">
+            <children />
+        </button>
+    </elseif>
+    <else>
+        <button id="btn">
+            <children />
+        </button>
+    </else>
+
+    <script>
+        document.getElementById("btn").onclick = () => {
+            if (action.value !== undefined) {
+                action.value();
+            }
+        };
+    </script>
+
+    <style scoped>
+        button {
+            border: 2px solid black;
+            background-color: rgb(255, 247, 159);
+            padding: .4rem;
+            font-size: medium;
+            transition-duration: 200ms;
+            min-width: 4rem;
+        }
+
+        button:hover {
+            cursor: pointer;
+            background-color: white;
+        }
+    </style>
+
+    <style scoped>
+        .danger {
+            background-color: brown;
+            color: aliceblue;
+        }
+
+        .danger:hover {
+            background-color: darkred;
+        }
+
+        .confirm {
+            background-color: forestgreen;
+            color: aliceblue;
+        }
+
+        .confirm:hover {
+            background-color: darkgreen;
+        }
+    </style>
+</component>

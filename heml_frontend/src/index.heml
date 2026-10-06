@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogPosts</title>
+    <import src="./comp/navbar.heml" as="navbar" />
+    <import src="./comp/post-preview.heml" as="post-preview" />
+</head>
+
+<body>
+    <var name="postsState" value="{{ status: 0, data: null }}" />
+    <var name="posts" />
+
+    <navbar onHomePage />
+
+    <match value="{postsState.value}">
+        <arm expr="{{status: 0}}">
+            Loading!
+        </arm>
+        <arm expr="{{status: 200}}">
+            <div class="post-container">
+                <for each="{posts}" as="post" keys="{post.id}">
+                    <post-preview post="{post}" />
+                </for>
+            </div>
+        </arm>
+        <arm expr="{{status: 500}}">
+            Internal error
+        </arm>
+        <arm default>
+            Unexpected error
+        </arm>
+    </match>
+
+    <script>
+        const loadPosts = async () => {
+            try {
+                const resp = await fetch(`http://localhost:3000/api/v1/posts`);
+                const data = await resp.json();
+                postsState.value = { status: resp.status, data: data };
+                console.log(data);
+                posts.value = data;
+            } catch (error) {
+                console.error(error);
+                postsState.value = { status: 500, data: null };
+            }
+        };
+
+        loadPosts();
+    </script>
+
+    <style>
+        .post-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            align-items: flex-start;
+            align-content: stretch;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+    </style>
+</body>
+
+</html>

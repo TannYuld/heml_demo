@@ -1,0 +1,243 @@
+<!DOCTYPE component>
+<import src="./divider.heml" as="divider" />
+<import src="./modal.heml" as="modal" />
+<import src="./modal:button.heml" as="modal:button" />
+
+<properties>
+    <attribute name="post" optional />
+    <attribute name="onHomePage" optional />
+</properties>
+
+<component>
+    <var name="currentPost" value="{{ title: '', post: '' }}" />
+
+    <var name="showCreateModal" value="{false}" />
+    <var name="showDeleteModal" value="{false}" />
+    <var name="showEditModal" value="{false}" />
+
+    <div class="navbar">
+        <if condition="{onHomePage.value !== undefined}">
+            <h1>My amazing blog wisth backend</h1>
+
+            <button id="create-button" class="positive">
+                Create
+            </button>
+
+            <script>
+                document.getElementById("create-button").onclick = () => {
+                    showCreateModal.value = true;
+                }
+            </script>
+        </if>
+        <else>
+            <a href="./index.html">
+                <h1>My amazing blog wisth backend</h1>
+            </a>
+        </else>
+
+        <if condition="{post.value !== undefined}">
+            <if condition="{post.value.status === 200}">
+                <div>
+                    <button id="edit-button">
+                        Edit
+                    </button>
+
+                    <button id="delete-button" class="danger">
+                        Delete
+                    </button>
+                </div>
+
+                <script>
+                    document.getElementById("delete-button").onclick = () => {
+                        showDeleteModal.value = true;
+                    }
+
+                    document.getElementById("edit-button").onclick = () => {
+                        showEditModal.value = true;
+                    }
+                </script>
+            </if>
+        </if>
+    </div>
+    <divider />
+
+    <modal showModal="{showDeleteModal}" onOverlayClick="{() => {showDeleteModal.value = false;}}">
+        <modal:content>
+            <h4>Are you sure to delete that?</h4>
+        </modal:content>
+        <modal:footer>
+            <modal:button danger action="{() => {
+                const deletePost = async () => {
+                    try {
+                        const resp = await fetch(`http://localhost:3000/api/v1/posts/${post.value.data.id}`, {method: 'DELETE'});
+                        console.log(resp);
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        console.error(error);
+                    }
+                };
+
+                deletePost();
+            }}">
+                Confirm
+            </modal:button>
+            <modal:button action="{() => {showDeleteModal.value = false;}}">
+                Cancel
+            </modal:button>
+        </modal:footer>
+    </modal>
+
+    <modal showModal="{showCreateModal}" onOverlayClick="{() => {showCreateModal.value = false;}}">
+        <modal:content>
+            <div class="create-modal-content">
+                <label>Title</label>
+                <input id="create-modal-title" />
+                <label>Post</label>
+                <textarea id="create-modal-post" />
+            </div>
+        </modal:content>
+        <modal:footer>
+            <modal:button confirm action="{() => {
+                const createPost = async () => {
+                    try {
+                        currentPost.value.title = document.getElementById('create-modal-title').value;
+                        currentPost.value.post = document.getElementById('create-modal-post').value;
+                        const resp = await fetch(`http://localhost:3000/api/v1/posts`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(currentPost.value)});
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        console.error(error);
+                    }
+                };
+
+                createPost();
+            }}">
+                Create
+            </modal:button>
+            <modal:button action="{() => {showCreateModal.value = false;}}">
+                Cancel
+            </modal:button>
+        </modal:footer>
+    </modal>
+
+    <modal showModal="{showEditModal}" onOverlayClick="{() => {showEditModal.value = false;}}">
+        <modal:content>
+            <div class="create-modal-content">
+                <label>Title</label>
+                <input id="edit-modal-title" />
+                <label>Post</label>
+                <textarea id="edit-modal-post" />
+            </div>
+
+            <script>
+                document.getElementById("edit-modal-title").value = post.value.data.title;
+                document.getElementById("edit-modal-post").value = post.value.data.post;
+            </script>
+        </modal:content>
+        <modal:footer>
+            <modal:button confirm action="{() => {
+                const editPost = async () => {
+                    try {
+                        currentPost.value.title = document.getElementById('edit-modal-title').value;
+                        currentPost.value.post = document.getElementById('edit-modal-post').value;
+                        currentPost.value.id = post.value.data.id;
+
+                        const resp = await fetch(`http://localhost:3000/api/v1/posts`, {method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(currentPost.value)});
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        console.error(error);
+                    }
+                };
+
+                editPost();
+            }}">
+                Apply
+            </modal:button>
+            <modal:button action="{() => {showEditModal.value = false;}}">
+                Cancel
+            </modal:button>
+        </modal:footer>
+    </modal>
+
+    <style scoped>
+        h1 {
+            user-select: none;
+        }
+
+        a {
+            text-decoration: inherit;
+            color: inherit;
+            user-select: none;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        button {
+            border: 2px solid black;
+            background-color: antiquewhite;
+            height: 3rem;
+            width: 5rem;
+            font-size: medium;
+            transition-duration: 200ms;
+            margin-left: 1rem;
+        }
+
+        button:hover {
+            cursor: pointer;
+            background-color: burlywood;
+        }
+
+        .danger {
+            background-color: brown;
+            color: aliceblue;
+        }
+
+        .danger:hover {
+            background-color: darkred;
+        }
+
+        .positive {
+            background-color: forestgreen;
+            color: aliceblue;
+        }
+
+        .positive:hover {
+            background-color: darkgreen;
+        }
+
+        .create-modal-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        input {
+            font-size: large;
+            outline: 2px solid black;
+            border-radius: 0px;
+            border: none;
+        }
+
+        input:focus {
+            outline-width: 3px;
+        }
+
+        textarea {
+            font-size: large;
+            outline: 2px solid black;
+            border-radius: 0px;
+            border: none;
+            resize: none;
+            height: 5rem;
+        }
+
+        textarea:focus {
+            outline-width: 3px;
+        }
+    </style>
+</component>

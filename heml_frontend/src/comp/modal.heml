@@ -1,0 +1,65 @@
+<!DOCTYPE component>
+<properties>
+    <attribute name="showModal" />
+    <attribute name="onOverlayClick" optional />
+</properties>
+<component>
+    <if condition="{showModal.value}">
+        <div id="overlay" class="bg-overlay"></div>
+        <div id="modal" class="modal-container">
+            <div class="content">
+                <children name="content" />
+            </div>
+
+            <div class="footer">
+                <children name="footer" />
+            </div>
+        </div>
+
+        <script>
+            document.getElementById("overlay").onclick = () => {
+                if (onOverlayClick.value !== undefined) {
+                    onOverlayClick.value();
+                }
+            };
+        </script>
+    </if>
+
+    <style scoped>
+        .modal-container {
+            user-select: none;
+            background-color: bisque;
+            min-height: 10rem;
+            min-width: 30rem;
+            border: 3px solid black;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .content {
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            height: 100vh;
+            width: 100vw;
+            background-color: black;
+            opacity: 0.6;
+        }
+    </style>
+</component>
